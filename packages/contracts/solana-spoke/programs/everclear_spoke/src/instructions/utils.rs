@@ -40,7 +40,7 @@ pub(crate) fn normalize_decimals(
 }
 
 /// Minimal keccak256 using the tiny_keccak crate.
-fn keccak_256(data: &[u8]) -> [u8; 32] {
+pub(crate) fn keccak_256(data: &[u8]) -> [u8; 32] {
     use tiny_keccak::{Hasher, Keccak};
     let mut hasher = Keccak::v256();
     hasher.update(data);

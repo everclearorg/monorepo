@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 use crate::{
-    hyperlane::{InterchainGasPaymasterType, SerializableAccountMeta},
+    hyperlane::{InterchainGasPaymasterType, SerializableAccountMeta, U256},
     instructions::{messages::Settlement, EVMIntent},
 };
 
@@ -165,6 +165,17 @@ pub struct IntentFilledEvent {
     pub receiver: [u8; 32],
     pub amount_out: u64,
     pub intent: EVMIntent,
+}
+
+#[event]
+pub struct CcipSettlementReceived {
+    pub origin: u32,
+    pub settlement_hash: [u8; 32],
+    pub intent_id: [u8; 32],
+    pub amount: U256,
+    pub asset: Pubkey,
+    pub recipient: Pubkey,
+    pub update_virtual_balance: bool,
 }
 
 #[event]

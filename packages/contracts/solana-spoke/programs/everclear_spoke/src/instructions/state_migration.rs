@@ -96,3 +96,33 @@ pub struct MigrateSpokeState<'info> {
     pub admin: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_v1_migration_constants_are_consistent() {
+        assert_eq!(OLD_SPOKE_STATE_SIZE, 222);
+        assert_eq!(OLD_SPOKE_STATE_SIZE_ALT, 224);
+        assert_eq!(NEW_FIELDS_LEN, 37);
+        let v1_target_body = OLD_SPOKE_STATE_SIZE + NEW_FIELDS_LEN;
+        assert!(v1_target_body < 339, "v1 target body should be less than current body");
+    }
+
+    #[test]
+    fn test_spoke_state_size_is_339() {
+        // SpokeState::SIZE should be 339 (no pending_ccip_settlement — that's in the inbox PDA now)
+        assert_eq!(SpokeState::SIZE, 339);
+        assert_eq!(8 + SpokeState::SIZE, 347, "Total account size should be 347");
+    }
+
+    #[test]
+    fn test_option_none_is_zero_byte() {
+        let none_val: Option<u8> = None;
+        let mut buf = Vec::new();
+        none_val.serialize(&mut buf).unwrap();
+        assert_eq!(buf[0], 0u8, "Option::None discriminant must be 0x00");
+        assert_eq!(buf.len(), 1, "Option::None should serialize to exactly 1 byte");
+    }
+}

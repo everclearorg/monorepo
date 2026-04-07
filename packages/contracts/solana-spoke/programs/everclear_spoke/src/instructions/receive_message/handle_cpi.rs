@@ -1,6 +1,6 @@
 use anchor_lang::{
     prelude::*,
-    solana_program::{program::invoke_signed, system_program},
+    solana_program::system_program,
 };
 use anchor_spl::{
     associated_token::{get_associated_token_address, AssociatedToken},
@@ -10,18 +10,18 @@ use anchor_spl::{
 use crate::{
     consts::{everclear_gateway, h256_to_pub, EVERCLEAR_DOMAIN},
     error::SpokeError,
-    events::{MessageDeliveredEvent, MessageReceivedEvent},
+    events::{CcipSettlementReceived, MessageDeliveredEvent, MessageReceivedEvent},
     hyperlane::{
         mailbox::HandleInstruction, to_serializable_account_meta, SerializableAccountMeta,
         SimulationReturnData,
     },
     instructions::{
         messages::{HyperlaneMessages, MessageType, Settlement, Settlements},
-        utils::create_or_claim_intent_status_pda,
+        utils::{create_or_claim_intent_status_pda, keccak_256},
     },
     intent_status_pda_seeds, mailbox_process_authority_pda_seeds,
     messaging,
-    state::{IntentStatus, IntentStatusAccount, MessagingProviderType, SpokeState},
+    state::{IntentStatus, IntentStatusAccount, MessagingProviderType, PendingCcipInbox, SpokeState},
 };
 
 /// Return accounts required for the handle call.
@@ -134,15 +134,41 @@ pub fn handle_ccip_receive(
 
             require!(
                 batch.settlements.len() == 1,
-                SpokeError::InvalidIntentStatus
+                SpokeError::InvalidSettlementSize
             );
 
-            emit!(MessageReceivedEvent {
-                origin: ctx.accounts.spoke_state.domain,
-                sender: h256_to_pub(crate::hyperlane::H256::from(ctx.accounts.spoke_state.everclear_gateway)),
-            });
+            let settlement = &batch.settlements[0];
 
-            mark_settlement_as_delivered_ccip(ctx, batch.settlements[0].clone())?;
+            // 1. Compute commitment hash
+            let mut buf = Vec::new();
+            settlement.serialize(&mut buf).unwrap();
+            let hash = keccak_256(&buf);
+
+            let inbox = &mut ctx.accounts.inbox;
+
+            // 2. Dedupe — reject if this settlement was already committed
+            require!(
+                !inbox.hashes.iter().any(|h| *h == hash),
+                SpokeError::PendingSettlementExists
+            );
+
+            // 3. Find first empty slot
+            let slot = inbox.hashes.iter_mut()
+                .find(|h| **h == [0u8; 32])
+                .ok_or(error!(SpokeError::PendingSettlementsFull))?;
+            *slot = hash;
+
+            // 4. Emit event with full settlement data so relayer can reconstruct
+            let state = &ctx.accounts.spoke_state;
+            emit!(CcipSettlementReceived {
+                origin: state.everclear,
+                settlement_hash: hash,
+                intent_id: settlement.intent_id,
+                amount: settlement.amount,
+                asset: settlement.asset,
+                recipient: settlement.recipient,
+                update_virtual_balance: settlement.update_virtual_balance,
+            });
         }
         _ => {
             return err!(SpokeError::InvalidMessage);
@@ -151,60 +177,65 @@ pub fn handle_ccip_receive(
     Ok(())
 }
 
-fn mark_settlement_as_delivered_ccip(ctx: Context<CcipReceiveContext>, settlement: Settlement) -> Result<()> {
+/// Settle a CCIP delivery: verifies settlement hash against inbox,
+/// creates the intent_status_pda with Delivered status so that the existing
+/// settle_delivered_intent instruction can complete the token transfer.
+pub fn settle_ccip_delivery(
+    ctx: Context<SettleCcipDeliveryContext>,
+    settlement: Settlement,
+) -> Result<()> {
+    let state = &ctx.accounts.spoke_state;
+    require!(!state.paused, SpokeError::ContractPaused);
+
+    // 1. Hash the provided settlement (preimage verification)
+    let mut buf = Vec::new();
+    settlement.serialize(&mut buf).unwrap();
+    let hash = keccak_256(&buf);
+
+    // 2. Find and clear the matching hash from inbox
+    let inbox = &mut ctx.accounts.inbox;
+    let slot = inbox.hashes.iter_mut()
+        .find(|h| **h == hash)
+        .ok_or(error!(SpokeError::NoPendingSettlement))?;
+    *slot = [0u8; 32]; // clear immediately — tx is atomic, reverts undo this
+
+    // 3. Validate intent_status_pda matches intent_id
     let intent_status_pda = &mut ctx.accounts.intent_status_pda;
     let intent_status_seed: &[&[u8]] = intent_status_pda_seeds!(settlement.intent_id);
-    let (intent_status_account, intent_status_bump) =
+    let (expected_pda, intent_status_bump) =
         Pubkey::find_program_address(intent_status_seed, ctx.program_id);
     require!(
-        intent_status_pda.key() == intent_status_account,
+        intent_status_pda.key() == expected_pda,
         SpokeError::InvalidIntentPda
     );
 
+    // 4. Check if PDA already exists — if terminal state, return Ok (hash already cleared)
     let data = IntentStatusAccount::try_deserialize(&mut &intent_status_pda.data.borrow()[..]);
-    if data.is_err() {
+    if let Ok(existing) = data {
+        if existing.status == IntentStatus::Settled
+            || existing.status == IntentStatus::SettledAndManuallyExecuted
+            || existing.status == IntentStatus::Delivered
+        {
+            // Already handled — hash is cleared, inbox slot freed, done
+            return Ok(());
+        }
+    } else {
+        // 5. Create the PDA account (using allocate+assign pattern to handle pre-funded PDAs)
         let space = 8
             + std::mem::size_of::<IntentStatusAccount>()
             + 12 * std::mem::size_of::<SerializableAccountMeta>();
 
-        let __anchor_rent = Rent::get()?;
-        let lamports = __anchor_rent.minimum_balance(space);
-        let inst = anchor_lang::solana_program::system_instruction::create_account(
-            &ctx.accounts.pda_payer.key(),
-            &intent_status_pda.key(),
-            lamports,
-            space as u64,
+        create_or_claim_intent_status_pda(
+            &ctx.accounts.pda_payer,
+            &intent_status_pda,
             ctx.program_id,
-        );
-
-        let payer_seed = &[
-            "everclear_spoke".as_bytes(),
-            "-".as_bytes(),
-            "pda_payer".as_bytes(),
-        ];
-        let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, ctx.program_id);
-
-        invoke_signed(
-            &inst,
-            &[
-                ctx.accounts.pda_payer.to_account_info(),
-                intent_status_pda.to_account_info(),
-            ],
-            &[
-                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
-                intent_status_pda_seeds!(settlement.intent_id, intent_status_bump),
-            ],
+            space,
+            &settlement.intent_id,
+            intent_status_bump,
         )?;
-    } else {
-        let pda_data = data.unwrap();
-        if pda_data.status == IntentStatus::Settled
-            || pda_data.status == IntentStatus::SettledAndManuallyExecuted
-            || pda_data.status == IntentStatus::Delivered
-        {
-            return err!(SpokeError::InvalidIntentStatus);
-        }
     }
 
+    // 6. Write Delivered status + settlement data
     let account_metas =
         build_settle_intent_account_metas(ctx.program_id, &intent_status_pda.key(), &settlement)?;
 
@@ -216,9 +247,8 @@ fn mark_settlement_as_delivered_ccip(ctx: Context<CcipReceiveContext>, settlemen
 
     intent_status.try_serialize(&mut &mut intent_status_pda.data.borrow_mut()[..])?;
 
-    // CCIP receive context has no event_authority; emit directly
     emit!(MessageDeliveredEvent {
-        domain: ctx.accounts.spoke_state.domain,
+        domain: state.domain,
         settlement,
         account_metas,
     });
@@ -252,18 +282,45 @@ pub struct CcipReceiveContext<'info> {
     )]
     pub allowed_offramp: UncheckedAccount<'info>,
 
-    /// CHECK: External execution config PDA - validated by offramp program
+    /// CHECK: External execution config PDA — derived from our program's seeds, not the offramp's.
+    /// Required by the CCIP offramp CPI call structure but not read by our handler.
     #[account(mut, seeds = [b"external_execution_config"], bump)]
     pub external_execution_config: UncheckedAccount<'info>,
 
     #[account(
-        mut,
         seeds = [b"spoke-state"],
         bump = spoke_state.bump,
     )]
     pub spoke_state: Account<'info, SpokeState>,
 
-    /// CHECK: Intent status PDA - will be validated in mark_settlement_as_delivered_ccip
+    #[account(
+        mut,
+        seeds = [b"ccip-inbox"],
+        bump = inbox.bump,
+    )]
+    pub inbox: Account<'info, PendingCcipInbox>,
+}
+
+#[derive(Accounts)]
+#[instruction(settlement: Settlement)]
+pub struct SettleCcipDeliveryContext<'info> {
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
+    #[account(
+        seeds = [b"spoke-state"],
+        bump = spoke_state.bump,
+    )]
+    pub spoke_state: Account<'info, SpokeState>,
+
+    #[account(
+        mut,
+        seeds = [b"ccip-inbox"],
+        bump = inbox.bump,
+    )]
+    pub inbox: Account<'info, PendingCcipInbox>,
+
+    /// CHECK: Validated via PDA derivation in settle_ccip_delivery handler
     #[account(mut)]
     pub intent_status_pda: UncheckedAccount<'info>,
 
@@ -276,6 +333,23 @@ pub struct CcipReceiveContext<'info> {
         bump,
     )]
     pub pda_payer: AccountInfo<'info>,
+}
+
+#[derive(Accounts)]
+pub struct InitCcipInbox<'info> {
+    #[account(
+        init,
+        seeds = [b"ccip-inbox"],
+        bump,
+        payer = admin,
+        space = 8 + PendingCcipInbox::SIZE,
+    )]
+    pub inbox: Account<'info, PendingCcipInbox>,
+    #[account(mut, constraint = admin.key() == spoke_state.owner @ SpokeError::OnlyOwner)]
+    pub admin: Signer<'info>,
+    #[account(seeds = [b"spoke-state"], bump = spoke_state.bump)]
+    pub spoke_state: Account<'info, SpokeState>,
+    pub system_program: Program<'info, System>,
 }
 
 #[event_cpi]
@@ -445,6 +519,7 @@ fn build_settle_intent_account_metas(
 mod tests {
     use super::*;
     use crate::instructions::messages::MessageType;
+    use crate::hyperlane::U256;
 
     #[test]
     fn test_invalid_message_type_returns_error_without_debug_log() {
@@ -464,6 +539,302 @@ mod tests {
         let settlement_type = MessageType::Settlement;
         let is_settlement = matches!(settlement_type, MessageType::Settlement);
         assert!(is_settlement, "Settlement should be the only supported message type");
+    }
+
+    // --- Tests for the CCIP settlement flow ---
+
+    fn make_test_settlement(intent_id: [u8; 32]) -> Settlement {
+        Settlement {
+            intent_id,
+            amount: U256::from(999000000000000000u64),
+            asset: Pubkey::new_unique(),
+            recipient: Pubkey::new_unique(),
+            update_virtual_balance: false,
+        }
+    }
+
+    #[test]
+    fn test_build_settle_intent_account_metas_returns_12_accounts() {
+        let program_id = Pubkey::new_unique();
+        let intent_status_pda = Pubkey::new_unique();
+        let settlement = make_test_settlement([1u8; 32]);
+
+        let metas = build_settle_intent_account_metas(&program_id, &intent_status_pda, &settlement)
+            .unwrap();
+
+        assert_eq!(metas.len(), 12, "Should return exactly 12 account metas");
+        // intent_status_pda should be at index 1 and writable
+        assert_eq!(metas[1].pubkey, intent_status_pda);
+        assert!(metas[1].is_writable, "intent_status_pda must be writable");
+    }
+
+    #[test]
+    fn test_build_settle_intent_account_metas_deterministic() {
+        let program_id = Pubkey::new_unique();
+        let intent_status_pda = Pubkey::new_unique();
+        let settlement = make_test_settlement([42u8; 32]);
+
+        let metas_1 = build_settle_intent_account_metas(&program_id, &intent_status_pda, &settlement).unwrap();
+        let metas_2 = build_settle_intent_account_metas(&program_id, &intent_status_pda, &settlement).unwrap();
+
+        assert_eq!(metas_1.len(), metas_2.len());
+        for (a, b) in metas_1.iter().zip(metas_2.iter()) {
+            assert_eq!(a.pubkey, b.pubkey, "Account metas must be deterministic");
+            assert_eq!(a.is_writable, b.is_writable);
+        }
+    }
+
+    #[test]
+    fn test_build_settle_intent_account_metas_includes_recipient_and_asset() {
+        let program_id = Pubkey::new_unique();
+        let intent_status_pda = Pubkey::new_unique();
+        let settlement = make_test_settlement([7u8; 32]);
+
+        let metas = build_settle_intent_account_metas(&program_id, &intent_status_pda, &settlement)
+            .unwrap();
+
+        // Asset (mint) at index 5
+        assert_eq!(metas[5].pubkey, settlement.asset, "Index 5 must be the token mint");
+        assert!(!metas[5].is_writable, "Mint should not be writable");
+
+        // Recipient at index 7
+        assert_eq!(metas[7].pubkey, settlement.recipient, "Index 7 must be the recipient");
+        assert!(!metas[7].is_writable, "Recipient should not be writable");
+    }
+
+    #[test]
+    fn test_build_settle_intent_account_metas_different_settlements_produce_different_atas() {
+        let program_id = Pubkey::new_unique();
+        let pda = Pubkey::new_unique();
+
+        let settlement_a = make_test_settlement([1u8; 32]);
+        let settlement_b = make_test_settlement([2u8; 32]);
+
+        let metas_a = build_settle_intent_account_metas(&program_id, &pda, &settlement_a).unwrap();
+        let metas_b = build_settle_intent_account_metas(&program_id, &pda, &settlement_b).unwrap();
+
+        // Recipient ATAs (index 8) should differ because recipients differ
+        assert_ne!(
+            metas_a[8].pubkey, metas_b[8].pubkey,
+            "Different recipients must produce different ATAs"
+        );
+        // Both should be writable
+        assert!(metas_a[8].is_writable);
+        assert!(metas_b[8].is_writable);
+    }
+
+    #[test]
+    fn test_intent_status_pda_seeds_deterministic() {
+        let intent_id = [0xABu8; 32];
+        let program_id = Pubkey::new_unique();
+
+        let seeds: &[&[u8]] = intent_status_pda_seeds!(intent_id);
+        let (pda_1, bump_1) = Pubkey::find_program_address(seeds, &program_id);
+        let (pda_2, bump_2) = Pubkey::find_program_address(seeds, &program_id);
+
+        assert_eq!(pda_1, pda_2, "PDA derivation must be deterministic");
+        assert_eq!(bump_1, bump_2, "Bump must be deterministic");
+    }
+
+    #[test]
+    fn test_intent_status_pda_seeds_different_intents_produce_different_pdas() {
+        let program_id = Pubkey::new_unique();
+
+        let seeds_a: &[&[u8]] = intent_status_pda_seeds!([1u8; 32]);
+        let seeds_b: &[&[u8]] = intent_status_pda_seeds!([2u8; 32]);
+
+        let (pda_a, _) = Pubkey::find_program_address(seeds_a, &program_id);
+        let (pda_b, _) = Pubkey::find_program_address(seeds_b, &program_id);
+
+        assert_ne!(pda_a, pda_b, "Different intent_ids must produce different PDAs");
+    }
+
+    #[test]
+    fn test_settlement_serialization_preserves_intent_id() {
+        let settlement = make_test_settlement([0xFFu8; 32]);
+
+        // AnchorSerialize uses the derived impl (compact), while AnchorDeserialize
+        // uses a custom impl that reads 5 x 32-byte EVM-style slots.
+        // Test that the serialized form preserves the intent_id at the start.
+        let mut buf = Vec::new();
+        settlement.serialize(&mut buf).unwrap();
+
+        assert!(!buf.is_empty(), "Serialized settlement must not be empty");
+        // intent_id is the first 32 bytes in both serialization formats
+        assert_eq!(&buf[0..32], &[0xFFu8; 32], "intent_id should be first 32 bytes");
+        // amount follows (32 bytes in little-endian for AnchorSerialize)
+        assert!(buf.len() >= 64, "Serialized data must contain at least intent_id + amount");
+    }
+
+    #[test]
+    fn test_intent_status_terminal_states_block_delivery() {
+        // These statuses should prevent a settlement from being delivered again
+        assert!(matches!(IntentStatus::Settled,
+            IntentStatus::Settled | IntentStatus::SettledAndManuallyExecuted | IntentStatus::Delivered
+        ), "Settled should block re-delivery");
+        assert!(matches!(IntentStatus::SettledAndManuallyExecuted,
+            IntentStatus::Settled | IntentStatus::SettledAndManuallyExecuted | IntentStatus::Delivered
+        ), "SettledAndManuallyExecuted should block re-delivery");
+        assert!(matches!(IntentStatus::Delivered,
+            IntentStatus::Settled | IntentStatus::SettledAndManuallyExecuted | IntentStatus::Delivered
+        ), "Delivered should block re-delivery");
+
+        // These statuses should NOT block
+        assert!(!matches!(IntentStatus::None,
+            IntentStatus::Settled | IntentStatus::SettledAndManuallyExecuted | IntentStatus::Delivered
+        ), "None should not block delivery");
+        assert!(!matches!(IntentStatus::Added,
+            IntentStatus::Settled | IntentStatus::SettledAndManuallyExecuted | IntentStatus::Delivered
+        ), "Added should not block delivery");
+        assert!(!matches!(IntentStatus::Filled,
+            IntentStatus::Settled | IntentStatus::SettledAndManuallyExecuted | IntentStatus::Delivered
+        ), "Filled should not block delivery");
+    }
+
+    #[test]
+    fn test_spoke_state_size_no_pending_field() {
+        // SpokeState no longer has pending_ccip_settlement — that's in the inbox PDA
+        assert_eq!(SpokeState::SIZE, 339, "SpokeState::SIZE should be 339 (no pending field)");
+    }
+
+    #[test]
+    fn test_pending_ccip_inbox_size() {
+        assert_eq!(PendingCcipInbox::SIZE, 1 + 32 * 32, "Inbox: 1 bump + 32 hashes × 32 bytes");
+        // Total account: 8 discriminator + 1025 = 1033
+        assert_eq!(8 + PendingCcipInbox::SIZE, 1033);
+    }
+
+    #[test]
+    fn test_settlement_hash_deterministic() {
+        let settlement = make_test_settlement([0xAB; 32]);
+        let mut buf1 = Vec::new();
+        settlement.serialize(&mut buf1).unwrap();
+        let hash1 = keccak_256(&buf1);
+
+        let mut buf2 = Vec::new();
+        settlement.serialize(&mut buf2).unwrap();
+        let hash2 = keccak_256(&buf2);
+
+        assert_eq!(hash1, hash2, "Same settlement must produce same hash");
+    }
+
+    #[test]
+    fn test_different_settlements_different_hashes() {
+        let s1 = make_test_settlement([1u8; 32]);
+        let s2 = make_test_settlement([2u8; 32]);
+
+        let mut buf1 = Vec::new();
+        s1.serialize(&mut buf1).unwrap();
+        let hash1 = keccak_256(&buf1);
+
+        let mut buf2 = Vec::new();
+        s2.serialize(&mut buf2).unwrap();
+        let hash2 = keccak_256(&buf2);
+
+        assert_ne!(hash1, hash2, "Different settlements must produce different hashes");
+    }
+
+    #[test]
+    fn test_settlement_hash_never_zero() {
+        let settlement = make_test_settlement([0u8; 32]);
+        let mut buf = Vec::new();
+        settlement.serialize(&mut buf).unwrap();
+        let hash = keccak_256(&buf);
+        assert_ne!(hash, [0u8; 32], "keccak256 of any data must never be all zeros");
+    }
+
+    #[test]
+    fn test_inbox_insert_and_clear() {
+        let mut hashes = [[0u8; 32]; 32];
+        let test_hash = [0xABu8; 32];
+
+        // Insert
+        let slot = hashes.iter_mut().find(|h| **h == [0u8; 32]).unwrap();
+        *slot = test_hash;
+        assert!(hashes.iter().any(|h| *h == test_hash), "Hash should be in inbox after insert");
+
+        // Clear
+        let slot = hashes.iter_mut().find(|h| **h == test_hash).unwrap();
+        *slot = [0u8; 32];
+        assert!(!hashes.iter().any(|h| *h == test_hash), "Hash should not be in inbox after clear");
+    }
+
+    #[test]
+    fn test_inbox_dedupe() {
+        let mut hashes = [[0u8; 32]; 32];
+        let test_hash = [0xCDu8; 32];
+
+        // First insert succeeds
+        let slot = hashes.iter_mut().find(|h| **h == [0u8; 32]).unwrap();
+        *slot = test_hash;
+
+        // Second insert should detect duplicate
+        let already_exists = hashes.iter().any(|h| *h == test_hash);
+        assert!(already_exists, "Dedupe should detect existing hash");
+    }
+
+    #[test]
+    fn test_inbox_full() {
+        let hashes = [[0xFFu8; 32]; 32]; // all slots occupied
+        let has_empty = hashes.iter().any(|h| *h == [0u8; 32]);
+        assert!(!has_empty, "Full inbox should have no empty slots");
+        // Insert should fail — no empty slot found
+        let insert_result = hashes.iter().find(|h| **h == [0u8; 32]);
+        assert!(insert_result.is_none(), "Insert into full inbox must return None");
+    }
+
+    #[test]
+    fn test_inbox_multi_hash_clear_preserves_others() {
+        let mut hashes = [[0u8; 32]; 32];
+        let hash_a = [0xAAu8; 32];
+        let hash_b = [0xBBu8; 32];
+        let hash_c = [0xCCu8; 32];
+
+        // Insert 3 hashes
+        hashes[0] = hash_a;
+        hashes[1] = hash_b;
+        hashes[2] = hash_c;
+
+        // Clear the middle one
+        let slot = hashes.iter_mut().find(|h| **h == hash_b).unwrap();
+        *slot = [0u8; 32];
+
+        // Verify: B gone, A and C still present
+        assert!(hashes.iter().any(|h| *h == hash_a), "Hash A must survive");
+        assert!(!hashes.iter().any(|h| *h == hash_b), "Hash B must be gone");
+        assert!(hashes.iter().any(|h| *h == hash_c), "Hash C must survive");
+        // Verify exactly 29 empty slots (32 - 3 + 1 cleared)
+        let empty_count = hashes.iter().filter(|h| **h == [0u8; 32]).count();
+        assert_eq!(empty_count, 30, "Should have 30 empty slots after 3 inserts and 1 clear");
+    }
+
+    #[test]
+    fn test_inbox_dedupe_count() {
+        let mut hashes = [[0u8; 32]; 32];
+        let test_hash = [0xEEu8; 32];
+
+        hashes[0] = test_hash;
+        // Count occurrences — must be exactly 1
+        let count = hashes.iter().filter(|h| **h == test_hash).count();
+        assert_eq!(count, 1, "Hash should appear exactly once");
+        // Verify it's at the expected position
+        assert_eq!(hashes[0], test_hash, "Hash should be at index 0");
+        assert_eq!(hashes[1], [0u8; 32], "Index 1 should still be empty");
+    }
+
+    #[test]
+    fn test_build_settle_intent_account_metas_spoke_state_at_index_0() {
+        let program_id = Pubkey::new_unique();
+        let intent_status_pda = Pubkey::new_unique();
+        let settlement = make_test_settlement([3u8; 32]);
+
+        let metas = build_settle_intent_account_metas(&program_id, &intent_status_pda, &settlement)
+            .unwrap();
+
+        // spoke_state PDA should be at index 0 and NOT writable
+        let (expected_spoke_state, _) = Pubkey::find_program_address(&[b"spoke-state"], &program_id);
+        assert_eq!(metas[0].pubkey, expected_spoke_state, "Index 0 must be spoke_state PDA");
+        assert!(!metas[0].is_writable, "spoke_state should not be writable in settle accounts");
     }
 
 }

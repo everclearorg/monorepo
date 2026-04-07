@@ -105,6 +105,19 @@ impl IntentStatusAccount {
     ;
 }
 
+/// CCIP inbox: holds keccak256 hashes of pending settlements awaiting relay.
+/// Each slot is [0u8; 32] (empty) or a settlement hash.
+#[account]
+pub struct PendingCcipInbox {
+    pub bump: u8,
+    pub hashes: [[u8; 32]; 32],
+}
+
+impl PendingCcipInbox {
+    pub const SIZE: usize = 1 // bump
+        + 32 * 32; // 32 hash slots × 32 bytes = 1,024
+}
+
 /// Intent status.
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
 pub enum IntentStatus {
