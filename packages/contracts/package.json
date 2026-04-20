@@ -66,6 +66,7 @@
     "test:integration": "forge test --match-contract Integration -vvv",
     "test:unit": "FOUNDRY_FUZZ_RUNS=5 forge test --mc Unit",
     "test:unit:deep": "FOUNDRY_FUZZ_RUNS=5000 yarn test:ci",
+    "test:zodiac": "bash -c 'source .env && forge test --match-contract ZodiacProdActions -vvvv'",
     "update-ism:prod": "bash -c 'source .env && forge script script/common/UpdateIsm.s.sol:TestnetProduction --rpc-url $0 $1'",
     "update-ism:staging": "bash -c 'source .env && forge script script/common/UpdateIsm.s.sol:TestnetStaging --rpc-url $0 $1'"
   },
