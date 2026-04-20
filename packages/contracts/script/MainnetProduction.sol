@@ -127,6 +127,7 @@ abstract contract MainnetAssets {
   address public constant BASE_WBTC = 0x0555E30da8f98308EdB960aa94C0Db47230d2B9c;
   address public constant BERACHAIN_WBTC = 0x0555E30da8f98308EdB960aa94C0Db47230d2B9c;
   address public constant MANTLE_WBTC = 0xCAbAE6f6Ea1ecaB08Ad02fE02ce9A44F09aebfA2;
+  bytes32 public constant SOLANA_WBTC = 0x233cea474d6cb513dad421c82e681f80ed7512455dfb91fc68363b99d9156582;
 
   //////////////////// PTSUSDE
   bytes32 public constant SOLANA_PTSUSDE = 0x05c0ad344d082fe99030a0414acc5726b24c89e1a511eac6e58d809145dd6503;

@@ -36,7 +36,7 @@ contract WBTC is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](5);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](4);
 
     ///// Ethereum
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -56,17 +56,8 @@ contract WBTC is AddAssetBase, MainnetProductionEnvironment {
       strategy: IEverclear.Strategy.DEFAULT
     });
 
-    ///// Berachain
-    _assetConfigs[2] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: BERACHAIN_WBTC.toBytes32(),
-      domain: BERACHAIN,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
     ///// Base
-    _assetConfigs[3] = IHubStorage.AssetConfig({
+    _assetConfigs[2] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
       adopted: BASE_WBTC.toBytes32(),
       domain: BASE,
@@ -74,11 +65,11 @@ contract WBTC is AddAssetBase, MainnetProductionEnvironment {
       strategy: IEverclear.Strategy.DEFAULT
     });
 
-    ///// Mantle
-    _assetConfigs[4] = IHubStorage.AssetConfig({
+    ///// Solana
+    _assetConfigs[3] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: MANTLE_WBTC.toBytes32(),
-      domain: MANTLE,
+      adopted: SOLANA_WBTC,
+      domain: SOLANA,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });
@@ -89,7 +80,7 @@ contract WBTC is AddAssetBase, MainnetProductionEnvironment {
 
     _setup = IHubStorage.TokenSetup({
       tickerHash: _tickerHash,
-      initLastClosedEpochProcessed: true,
+      initLastClosedEpochProcessed: false,
       prioritizedStrategy: IEverclear.Strategy.DEFAULT,
       maxDiscountDbps: 0,
       discountPerEpoch: 0,
