@@ -16,6 +16,7 @@
     "start:depositors": "CARTOGRAPHER_SERVICE=depositors npx ts-node src/run.ts",
     "start:monitor": "CARTOGRAPHER_SERVICE=monitor npx ts-node src/run.ts",
     "docker:start:postgrest": "docker run --name cartographer-postgrest --rm -p 3000:3000 -e PGRST_DB_URI=postgres://reader:3eadooor@host.docker.internal:5432/everclear -e PGRST_DB_SCHEMA=public -e PGRST_DB_ANON_ROLE=query postgrest/postgrest",
+    "docker:start:postgrest:dev": "docker run --name cartographer-postgrest --rm -p 3000:3000 -e 'PGRST_DB_URI=postgres://postgres:qwerty@host.docker.internal:5432/everclear?sslmode=disable' -e PGRST_DB_SCHEMA=public -e PGRST_DB_ANON_ROLE=query -e PGRST_JWT_SECRET postgrest/postgrest",
     "lint": "eslint ./src --ext .ts --env node",
     "test": "yarn test:unit",
     "test:unit": "nyc ts-mocha --require 'test/globalTestHook.ts' --check-leaks --exit --timeout 60000 'test/**/*.spec.ts'",
@@ -24,7 +25,8 @@
     "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
     "purge": "yarn clean && rimraf ./coverage ./node_modules",
     "tsp": "yarn run tsp:root \"$@\" --cwd $(pwd)",
-    "version": "yarn version"
+    "version": "yarn version",
+    "make-jwt": "bash ./scripts/make-jwt.sh"
   },
   "author": "Everclear / Wonderland",
   "license": "MIT",

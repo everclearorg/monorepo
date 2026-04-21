@@ -93,3 +93,39 @@ Create the Typescript schema using [Zapatos](https://jawj.github.io/zapatos/):
 ```sh
 yarn workspace @chimera-monorepo/database zapatos
 ```
+
+## PostgREST development & JWT authentication
+
+The Cartographer exposes its data via [PostgREST](https://postgrest.org/en/stable/) which expects a signed JWT so that the API can map the request to a Postgres role. A small helper script, `make-jwt.sh`, is provided for **local-only** development to mint such tokens.
+
+### 1. Generate a JWT
+
+```sh
+# If you already have a secret in an env var
+PGRST_JWT_SECRET="my_super_secret" yarn make-jwt
+# Or pass the secret as the first positional argument
+./scripts/make-jwt.sh my_super_secret
+```
+
+The command will print an HS256-signed token whose payload contains the role `api`.  Copy this token and use it as the `Authorization: Bearer <token>` header when querying PostgREST.
+
+### 2. Start PostgREST (dev)
+
+Set the same secret as an environment variable and launch PostgREST via the convenience yarn script:
+
+```sh
+PGRST_JWT_SECRET="my_super_secret" yarn docker:start:postgrest:dev
+```
+
+The script will:
+
+1. Pull the official `postgrest/postgrest` image if necessary.
+2. Forward the container port **3000** to your host.
+3. Pass the database connection string for the local Postgres instance (assumed to be running on `host.docker.internal`).
+4. Inject your `PGRST_JWT_SECRET` value into the container, enabling JWT verification.
+
+You can now query the API at `http://localhost:3000` with the JWT generated earlier.
+
+---
+
+If you need additional claims inside the token, open `scripts/make-jwt.sh` and adjust the `payload` JSON before generating the JWT.
